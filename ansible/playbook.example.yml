@@ -1,0 +1,10 @@
+- name: Deploy FastAPI and Angular Application
+  hosts: webserver
+  become: yes
+  vars:
+    backend_path: /opt/assistant-demo/assistant-backend
+    openai_api_key: "put your api-key here"
+  roles:
+    - common
+    - backend
+    - nginx

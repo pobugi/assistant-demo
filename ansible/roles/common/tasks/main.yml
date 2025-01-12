@@ -1,0 +1,9 @@
+- name: Update apt and install required packages
+  apt:
+    update_cache: yes
+#    upgrade: yes
+    name:
+      - git
+      - python3-pip
+      - python3-venv
+    state: present

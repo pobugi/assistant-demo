@@ -1,0 +1,35 @@
+- name: Clone backend repository
+  git:
+    repo: "https://github.com/pobugi/assistant-demo.git"
+    dest: /opt/assistant-demo/
+
+- name: Create Python virtual environment
+  command: python3 -m venv "{{ backend_path }}/venv"
+  args:
+    creates: "{{ backend_path }}/venv"
+
+- name: Ensure pip is installed in the virtual environment
+  shell: |
+    "{{ backend_path }}/venv/bin/python" -m ensurepip --upgrade
+    "{{ backend_path }}/venv/bin/python" -m pip install --upgrade pip setuptools
+  args:
+    creates: "{{ backend_path }}/venv/bin/pip"
+
+- name: Install backend dependencies
+  command:
+    cmd: "{{ backend_path }}/venv/bin/pip install -r requirements.txt"
+    chdir: "{{ backend_path }}"
+
+- name: Create .env file from template
+  template:
+    src: templates/.env.j2
+    dest: "{{ backend_path }}/.env"
+#    owner: "{{ ansible_user }}"
+#    group: "{{ ansible_user }}"
+#    mode: "0644"
+
+- name: Run Uvicorn server
+  # ps aux | grep uvicorn && kill <PID>
+  shell: "nohup {{ backend_path }}/venv/bin/uvicorn src.main:app --host 0.0.0.0 --port 8000 > uvicorn.log 2>&1 &"
+  args:
+    chdir: "{{ backend_path }}"
