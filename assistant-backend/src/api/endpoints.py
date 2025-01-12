@@ -9,10 +9,11 @@ router = APIRouter()
 class QueryRequest(BaseModel):
     user_input: str
 
+
 @router.post("/query")
 async def handle_query(request: QueryRequest):
-	try:
-		response = await process_query(request.user_input)
-		return {"response": response}
-	except Exception as e:
-		raise HTTPException(status_code=500, detail=str(e))
+    try:
+        response = await process_query(request.user_input)
+        return {"response": response}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
