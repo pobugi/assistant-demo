@@ -1,0 +1,41 @@
+- name: Install Node.js and npm
+  apt:
+    name:
+      - nodejs
+      - npm
+    state: present
+    update_cache: yes
+
+- name: Install Angular CLI globally
+  command: npm install -g @angular/cli@latest
+
+- name: Install Node.js dependencies
+  command:
+    cmd: npm install
+    chdir: "{{ frontend_path }}"
+
+- name: Build Angular project
+  command:
+    cmd: npm run build -- --configuration production
+    chdir: "{{ frontend_path }}"
+
+- name: Create frontend directory on server
+  file:
+    path: /var/www/frontend
+    state: directory
+    owner: root
+    group: root
+    mode: "0644"
+#    owner: www-data
+#    group: www-data
+#    mode: "0755"
+
+#- name: Copy built Angular files to server
+#  become: yes
+#  synchronize:
+#    src: "{{ frontend_path }}/dist/{{ frontend_project_name }}/"
+##    src: "/opt/assistant-demo/assistant-frontend/dist/assistant-frontend/"
+#    dest: /var/www/frontend/
+#    delete: yes
+#    rsync_opts:
+#      - "--exclude=.git"

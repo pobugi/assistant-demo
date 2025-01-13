@@ -6,7 +6,7 @@
           listen 80;
           server_name _;
 
-          location / {
+          location /api/ {
               proxy_pass http://127.0.0.1:8000;
               proxy_http_version 1.1;
               proxy_set_header Upgrade $http_upgrade;
@@ -19,7 +19,7 @@
     group: root
     mode: "0644"
 
-- name: Enable NGINX site configuration
+- name: Enable NGINX site configuration for FastAPI
   file:
     src: /etc/nginx/sites-available/assistant-backend
     dest: /etc/nginx/sites-enabled/assistant-backend
@@ -34,6 +34,37 @@
   command: nginx -t
 
 - name: Restart NGINX
+  service:
+    name: nginx
+    state: restarted
+
+- name: Create NGINX configuration for frontend
+  copy:
+    dest: /etc/nginx/sites-available/assistant-frontend
+    content: |
+      server {
+          listen 80;
+          server_name _;
+
+          # Frontend (Angular)
+          location / {
+              root /opt/assistant-demo/assistant-frontend/dist/assistant-frontend;
+              index index.html;
+              try_files $uri /index.html;
+          }
+      }
+    owner: root
+    group: root
+    mode: "0644"
+
+
+- name: Enable NGINX site configuration for frontend
+  file:
+    src: /etc/nginx/sites-available/assistant-frontend
+    dest: /etc/nginx/sites-enabled/assistant-frontend
+    state: link
+
+- name: Restart NGINX for frontend
   service:
     name: nginx
     state: restarted

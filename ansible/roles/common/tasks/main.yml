@@ -7,3 +7,9 @@
       - python3-pip
       - python3-venv
     state: present
+
+- name: Ensure rsync is installed on the target server
+  apt:
+    name: rsync
+    state: present
+    update_cache: yes
